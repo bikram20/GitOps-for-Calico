@@ -183,6 +183,20 @@ feodo-tracker   2019-10-17T04:24:33Z
 
 *Further verify by deleting/editing some resources using kubectl. Flux should sync those back to Git.* Also Flux will sync with Git every 5minutes (you really do not need every 5min, every day is good enough for most network policies use cases).
 
+I verified that by deleting a the security.quarantine policy, and changing the globalnetworkset 9-public-ip-range. As seen in the logs below, flux synced those back to source of truth in the next minute.
+
+```
+ts=2019-10-17T04:45:35.968702042Z caller=sync.go:479 method=Sync cmd=apply args= count=8
+ts=2019-10-17T04:45:36.311016612Z caller=sync.go:545 method=Sync cmd="kubectl apply -f -" took=342.248656ms err=null output="globalnetworkset.projectcalico.org/2-tigera-restricted-resource unchanged\nglobalnetworkset.projectcalico.org/9-public-ip-range unchanged\nnetworkpolicy.networking.k8s.io/access-nginx unchanged\nnetworkpolicy.networking.k8s.io/default-deny-new configured\nglobalthreatfeed.projectcalico.org/feodo-tracker unchanged\ntier.projectcalico.org/platform unchanged\ntier.projectcalico.org/security unchanged\nglobalnetworkpolicy.projectcalico.org/security.quarantine created"
+ts=2019-10-17T04:49:21.476402681Z caller=images.go:17 component=sync-loop msg="polling for new images for automated workloads"
+ts=2019-10-17T04:49:21.493849316Z caller=images.go:27 component=sync-loop msg="no automated workloads"
+ts=2019-10-17T04:49:27.140822117Z caller=loop.go:127 component=sync-loop event=refreshed url=ssh://git@github.com/bikram20/k8sconfig branch=master HEAD=c5672a7f48ca93e83c30ddbade86ca845b8a2aa3
+ts=2019-10-17T04:50:51.152889368Z caller=sync.go:479 method=Sync cmd=apply args= count=8
+ts=2019-10-17T04:50:51.361814405Z caller=sync.go:545 method=Sync cmd="kubectl apply -f -" took=208.823773ms err=null output="globalnetworkset.projectcalico.org/2-tigera-restricted-resource unchanged\nglobalnetworkset.projectcalico.org/9-public-ip-range configured\nnetworkpolicy.networking.k8s.io/access-nginx unchanged\nnetworkpolicy.networking.k8s.io/default-deny-new configured\nglobalthreatfeed.projectcalico.org/feodo-tracker unchanged\ntier.projectcalico.org/platform unchanged\ntier.projectcalico.org/security unchanged\nglobalnetworkpolicy.projectcalico.org/security.quarantine unchanged"
+^C
+[centos@ip-172-31-8-215 ~]$ 
+```
+
 
 ## Tune
 - Tune the ClusterRole for flux.
